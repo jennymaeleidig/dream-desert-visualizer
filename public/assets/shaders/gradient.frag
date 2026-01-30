@@ -4,7 +4,7 @@ precision highp float;
 precision highp sampler2D;
 
 // Add missing varying and uniforms for Processing compatibility
-varying vec4 vertTexCoord;
+varying vec2 vertTexCoord;
 uniform vec3 color_1;
 uniform vec3 color_2;
 

@@ -1,3 +1,51 @@
+# Node modules
+node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build output
+/dist/
+/build/
+
+# Vite / dev cache
+.vite/
+/.vite
+
+# Environment files
+.env
+.env.*
+.env.local
+
+# Editor and OS files
+.vscode/
+.idea/
 .DS_Store
-sketch/data/*.wav
-sketch/libraries/
+Thumbs.db
+
+# Coverage and test output
+coverage/
+.nyc_output/
+
+# Caches and lock files
+.cache/
+.eslintcache
+.parcel-cache/
+.pnp.*
+.pnp.js
+
+# TypeScript
+*.tsbuildinfo
+
+# Misc
+*.pem
+*.key
+debug.log
+
+# Keep package-lock.json committed for reproducible installs
+# (If you use a different lockfile or package manager, adjust accordingly)
