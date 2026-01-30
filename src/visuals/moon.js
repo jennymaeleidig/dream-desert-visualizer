@@ -45,6 +45,7 @@ export default function createMoonModule(p) {
     p.pop();
 
     // if not dragging, sync moon angle to audio position
+    // #TODO update when audio is added back
     if (!isDraggingMoon && audio && audio.maxTrackPos > 0) {
       const globalPos = audio.getCurrentGlobalPosition();
       moonAngle = p.map(

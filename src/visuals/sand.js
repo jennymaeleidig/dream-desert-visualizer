@@ -30,7 +30,7 @@ export default function createSandModule(p) {
     if (gradientShader && sandTexture && sandTexture.width > 1) {
       p.shader(gradientShader);
 
-      // Handle Point Sampling (Replaces Processing's textureSampling(1))
+      // Handle Point Sampling (Replaces Processing's textureSampling(1) == SHARP)
       if (!sandTextureConfigured) {
         // Access texture via the internal renderer to avoid 'canvas undefined' errors
         let tex = p._renderer.getTexture(sandTexture);
@@ -40,13 +40,16 @@ export default function createSandModule(p) {
         }
       }
 
+      //set shader uniforms (i
       gradientShader.setUniform("u_base", sandTexture);
+      // #TODO: make time scaled to position of moon
       gradientShader.setUniform("u_time", p.millis() / 1000.0);
       gradientShader.setUniform("color_1", LIGHTEST_ORANGE);
       gradientShader.setUniform("color_2", DARKEST_ORANGE);
 
       p.noStroke();
       // Draw the rect that the shader will fill with the sand texture
+      //p5.js requires drawing a shape to apply the shader since images use their own shaders internally
       p.rect(3, 203, sandTexture.width, sandTexture.height);
 
       p.resetShader();

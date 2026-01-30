@@ -2,6 +2,12 @@ export default function createPyramidModule(p) {
   let patternGraphics;
   let pyramidTexture;
   let colors = {};
+  let innerPyramidScale = 0.65;
+  let innerPyramidAlpha = 150;
+  //points found by measuring original image and scaling down to 512x512
+
+  // front wall points
+  //starting at bottom right then clockwise
   let frontCoords = [
     [335, 400],
     [55, 319],
@@ -29,9 +35,9 @@ export default function createPyramidModule(p) {
     const h = p.height || 512;
     const pg = p.createGraphics(w, h);
 
-    // Clear and set up drawing styles to match the Processing sketch
+    // Clear and set up drawing styles
     pg.clear();
-    pg.fill(colors.black);
+    pg.fill(0);
     pg.stroke(colors.lightOrange);
     pg.strokeWeight(1);
 
@@ -94,8 +100,6 @@ export default function createPyramidModule(p) {
     colors.lightOrange = p.color(214, 127, 29); // #d67f1d
     colors.orange = p.color(212, 106, 39); // #d46a27
     colors.darkestOrange = p.color(205, 79, 12); // #cd4f0c
-    // Use true black for pattern fill to match Processing's `black`
-    colors.black = p.color(0, 0, 0);
 
     // generate and keep graphics buffer so we can reuse/update it if needed
     patternGraphics = generatePattern();
@@ -111,7 +115,6 @@ export default function createPyramidModule(p) {
     // Right wall (semi-transparent overlay)
     p.stroke(colors.lightOrange);
     p.strokeWeight(0.5);
-    // use the sketch's black with alpha 150 (Processing used black,150)
     p.fill(0, 150);
     p.beginShape();
     // draw right wall
@@ -128,10 +131,10 @@ export default function createPyramidModule(p) {
     p.beginShape();
     p.textureMode(p.NORMAL);
     p.texture(pyramidTexture);
-    // UVs chosen to approximate the Processing mapping
+    //values found by trial and error to ensure proper texture mapping
     p.vertex(frontCoords[0][0], frontCoords[0][1], 1, 0.995);
     p.vertex(frontCoords[1][0], frontCoords[1][1], 0, 0.995);
-    p.vertex(frontCoords[2][0], frontCoords[2][1], 0.29, -0.0025); //these values x values found by trial and error to ensure proper texture mapping
+    p.vertex(frontCoords[2][0], frontCoords[2][1], 0.29, -0.0025);
     p.vertex(frontCoords[3][0], frontCoords[3][1], 0.365, -0.0025);
     p.endShape(p.CLOSE);
 
@@ -145,10 +148,10 @@ export default function createPyramidModule(p) {
     p.vertex(tipCoords[3][0], tipCoords[3][1]);
     p.endShape(p.CLOSE);
 
-    // Inner smaller pyramid (scaled) to create depth
-    p.fill(0, 150);
+    // Inner smaller pyramid w/ alpha to create depth
+    p.fill(0, innerPyramidAlpha);
     p.push();
-    const s = 0.65;
+    const s = innerPyramidScale;
     const cx = 276;
     const cy = 280;
     p.translate(cx, cy);
@@ -156,14 +159,14 @@ export default function createPyramidModule(p) {
     p.translate(-cx, -cy);
 
     p.beginShape();
-    // draw front facing wall
+    // draw inner front wall
     for (let i = 0; i < 4; i++) {
       let x = frontCoords[i][0];
       let y = frontCoords[i][1];
       p.vertex(x, y);
     }
 
-    // draw right wall
+    // draw inner right wall
     for (let i = 0; i < 2; i++) {
       let x = rightCoords[i][0];
       let y = rightCoords[i][1];
@@ -171,12 +174,12 @@ export default function createPyramidModule(p) {
     }
     p.endShape(p.CLOSE);
 
-    // Inner tip highlight (scaled)
+    // Inner tip highlight
     p.fill(
       p.red(colors.lightestOrange),
       p.green(colors.lightestOrange),
       p.blue(colors.lightestOrange),
-      255 * 0.8,
+      innerPyramidAlpha / 255,
     );
     p.noStroke();
     p.beginShape();
@@ -188,41 +191,21 @@ export default function createPyramidModule(p) {
 
     p.pop();
 
-    //want to place a solid black shape over the inner pyramid to create the illusion of depth
-    p.fill(0, 150);
-    p.noStroke();
+    //want to place a solid black shape over the inner pyramid right wall to create the illusion of depth
+    p.fill(0, innerPyramidAlpha);
     p.stroke(colors.lightOrange);
     p.strokeWeight(0.25);
-    //inner pyramid right for layering
     //measurements derived from the scaled inner pyramid
-    let innerPyramidBorder = [
-      [321, 352], //bottom left
-      [388, 300], //bottom right
+    let innerPyramidRightBorder = [
+      [321, 353], //bottom left
+      [390, 301], //bottom right
       [275.5, 201], //top
     ];
     p.beginShape();
-    for (let i = 0; i < innerPyramidBorder.length; i++) {
-      p.vertex(innerPyramidBorder[i][0], innerPyramidBorder[i][1]);
+    for (let i = 0; i < innerPyramidRightBorder.length; i++) {
+      p.vertex(innerPyramidRightBorder[i][0], innerPyramidRightBorder[i][1]);
     }
     p.endShape(p.CLOSE);
-
-    // // border of inner-most right wall
-    // p.noFill();
-    // p.stroke(colors.lightOrange);
-    // // p.strokeWeight(0.5);
-    // p.line(
-    //   innerPyramidBorder[0][0],
-    //   innerPyramidBorder[0][1],
-    //   innerPyramidBorder[1][0],
-    //   innerPyramidBorder[1][1],
-    // );
-    // p.line(
-    //   innerPyramidBorder[1][0],
-    //   innerPyramidBorder[1][1],
-    //   innerPyramidBorder[2][0],
-    //   innerPyramidBorder[2][1],
-    // );
-
     p.pop();
   }
 

@@ -1,9 +1,4 @@
 import p5 from "p5";
-import "p5/lib/addons/p5.sound";
-// import { AudioManager } from "./audio.js";
-
-let audio;
-
 import createStarsModule from "./visuals/stars.js";
 import createPyramidModule from "./visuals/pyramid.js";
 import createMoonModule from "./visuals/moon.js";
@@ -15,7 +10,7 @@ const sketch = (p) => {
   let pyramidModule;
   let moonModule;
   let sandModule;
-  let cnv;
+  let audio;
 
   p.preload = () => {
     starsModule = createStarsModule(p);

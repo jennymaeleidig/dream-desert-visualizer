@@ -18,12 +18,6 @@ uniform float u_time;
 // set each of these externally by passing in a PImage.
 uniform sampler2D u_base;
 
-// set externally within the pde / sketch itself
-
-// const float CANVAS_WIDTH = 506.0;
-// const float CANVAS_HEIGHT = 250.0;
-
-
 //
 // Description : Array and textureless GLSL 2D/3D/4D simplex 
 //               noise functions.
@@ -56,11 +50,11 @@ float snoise(vec3 v){
   const vec2  C = vec2(1.0/6.0, 1.0/3.0) ;
   const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);
 
-// First corner
+  // First corner
   vec3 i  = floor(v + dot(v, C.yyy) );
   vec3 x0 =   v - i + dot(i, C.xxx) ;
 
-// Other corners
+  // Other corners
   vec3 g = step(x0.yzx, x0.xyz);
   vec3 l = 1.0 - g;
   vec3 i1 = min( g.xyz, l.zxy );
@@ -80,8 +74,8 @@ float snoise(vec3 v){
            + i.y + vec4(0.0, i1.y, i2.y, 1.0 )) 
            + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));
 
-// Gradients: 7x7 points over a square, mapped onto an octahedron.
-// The ring size 17*17 = 289 is close to a multiple of 49 (49*6 = 294)
+  // Gradients: 7x7 points over a square, mapped onto an octahedron.
+  // The ring size 17*17 = 289 is close to a multiple of 49 (49*6 = 294)
   float n_ = 0.142857142857; // 1.0/7.0
   vec3  ns = n_ * D.wyz - D.xzx;
 
@@ -97,7 +91,6 @@ float snoise(vec3 v){
   vec4 b0 = vec4( x.xy, y.xy );
   vec4 b1 = vec4( x.zw, y.zw );
 
-  
   //vec4 s0 = vec4(lessThan(b0,0.0))*2.0 - 1.0;
   //vec4 s1 = vec4(lessThan(b1,0.0))*2.0 - 1.0;
   vec4 s0 = floor(b0)*2.0 + 1.0;
@@ -112,14 +105,14 @@ float snoise(vec3 v){
   vec3 p2 = vec3(a1.xy,h.z);
   vec3 p3 = vec3(a1.zw,h.w);
 
-//Normalise gradients
+  //Normalise gradients
   vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
   p0 *= norm.x;
   p1 *= norm.y;
   p2 *= norm.z;
   p3 *= norm.w;
 
-// Mix final noise value
+  // Mix final noise value
   vec4 m = max(0.5 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
   m = m * m;
   return 105.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1), 
@@ -136,7 +129,7 @@ float bg_noise(){
   float F = 0.11 * u_time; //flow amt
 
   //sum noise to introduce variance, these values can be tuned
-  // adjust flow direction by changing signs on F, present two flow to the right
+  // adjust flow direction by changing signs on F, presently two flow to the right
   float noise = 0.5;
   noise += snoise(vec3(gl_FragCoord.x * L - F* 1.0, gl_FragCoord.y * Y_SCALE * L * 1.0, u_time * S)) * 0.30;
   noise += snoise(vec3(gl_FragCoord.x * L + F * 0.6, gl_FragCoord.y * Y_SCALE * L * 0.85, u_time * S)) * 0.26;
