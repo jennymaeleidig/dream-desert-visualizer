@@ -1,7 +1,6 @@
-export default function createPyramidModule(p) {
+export default function createPyramidModule(p, colors) {
   let patternGraphics;
   let pyramidTexture;
-  let colors = {};
   let innerPyramidScale = 0.65;
   let innerPyramidAlpha = 150;
   //points found by measuring original image and scaling down to 512x512
@@ -14,6 +13,7 @@ export default function createPyramidModule(p) {
     [245, 155],
     [263, 160],
   ];
+
   // right wall points
   // starting at top right, clockwise
   let rightCoords = [
@@ -22,6 +22,8 @@ export default function createPyramidModule(p) {
     [335, 400],
     [263, 160.5],
   ];
+  // tip highlight points
+  // starting at bottom, clockwise
   let tipCoords = [
     [262.5, 156.5],
     [250, 153],
@@ -41,7 +43,7 @@ export default function createPyramidModule(p) {
     pg.stroke(colors.lightOrange);
     pg.strokeWeight(1);
 
-    // Define row types to match the Processing implementation
+    // Define cell dimensions
     const oddRow = { width: 15, height: 17, offsetX: -2 };
     const evenRow = { width: 15, height: 24, offsetX: 14 };
 
@@ -95,12 +97,6 @@ export default function createPyramidModule(p) {
   }
 
   function setup() {
-    // define colors to match the Processing sketch
-    colors.lightestOrange = p.color(207, 134, 22); // #cf8616
-    colors.lightOrange = p.color(214, 127, 29); // #d67f1d
-    colors.orange = p.color(212, 106, 39); // #d46a27
-    colors.darkestOrange = p.color(205, 79, 12); // #cd4f0c
-
     // generate and keep graphics buffer so we can reuse/update it if needed
     patternGraphics = generatePattern();
     pyramidTexture = patternGraphics;
@@ -108,7 +104,7 @@ export default function createPyramidModule(p) {
 
   function draw() {
     // Processing coordinates are top-left; in WEBGL p5 origin is center.
-    // Translate so we can use the same vertex coordinates as the Processing sketch.
+    // Translate so we can use the same vertex coordinates as Processing.
     p.push();
     p.translate(-p.width / 2, -p.height / 2);
 
@@ -142,10 +138,11 @@ export default function createPyramidModule(p) {
     p.fill(colors.lightestOrange);
     p.noStroke();
     p.beginShape();
-    p.vertex(tipCoords[0][0], tipCoords[0][1]);
-    p.vertex(tipCoords[1][0], tipCoords[1][1]);
-    p.vertex(tipCoords[2][0], tipCoords[2][1]);
-    p.vertex(tipCoords[3][0], tipCoords[3][1]);
+    for (let i = 0; i < 4; i++) {
+      let x = tipCoords[i][0];
+      let y = tipCoords[i][1];
+      p.vertex(x, y);
+    }
     p.endShape(p.CLOSE);
 
     // Inner smaller pyramid w/ alpha to create depth
@@ -179,14 +176,15 @@ export default function createPyramidModule(p) {
       p.red(colors.lightestOrange),
       p.green(colors.lightestOrange),
       p.blue(colors.lightestOrange),
-      innerPyramidAlpha / 255,
+      innerPyramidAlpha,
     );
     p.noStroke();
     p.beginShape();
-    p.vertex(tipCoords[0][0], tipCoords[0][1]);
-    p.vertex(tipCoords[1][0], tipCoords[1][1]);
-    p.vertex(tipCoords[2][0], tipCoords[2][1]);
-    p.vertex(tipCoords[3][0], tipCoords[3][1]);
+    for (let i = 0; i < 4; i++) {
+      let x = tipCoords[i][0];
+      let y = tipCoords[i][1];
+      p.vertex(x, y);
+    }
     p.endShape(p.CLOSE);
 
     p.pop();

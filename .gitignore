@@ -49,3 +49,5 @@ debug.log
 
 # Keep package-lock.json committed for reproducible installs
 # (If you use a different lockfile or package manager, adjust accordingly)
+
+creative-coding-final/
