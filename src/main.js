@@ -74,6 +74,16 @@ const sketch = (p) => {
     p.createCanvas(512, 512, p.WEBGL);
     p.noSmooth();
 
+    // Hide the loading overlay once p5.js is ready
+    const loadingOverlay = document.getElementById("loading-overlay");
+    if (loadingOverlay) {
+      loadingOverlay.classList.add("hidden");
+      // Remove from DOM after transition completes
+      setTimeout(() => {
+        loadingOverlay.remove();
+      }, 300);
+    }
+
     if (p.audio && p.audio.setup) p.audio.setup();
 
     if (starsModule.setup) starsModule.setup();
