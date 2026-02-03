@@ -8,4 +8,6 @@ Built with p5.js & GLSL
 
 Assets re-created by hand
 
-[Demo here]()
+[Demo here](https://dream-desert-visualizer.vercel.app/)
+
+Shoutout [https://jukehost.co.uk](https://jukehost.co.uk) for file hosting
