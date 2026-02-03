@@ -3,13 +3,23 @@ export default function createSandModule(p) {
   let sandBGTexture;
   let gradientShader;
   let sandTextureConfigured = false;
+  let audio = p.audio; // get reference to audio manager
 
-  const LIGHTEST_ORANGE = [207 / 255.0, 134 / 255.0, 22 / 255.0];
-  const DARKEST_ORANGE = [205 / 255.0, 79 / 255.0, 12 / 255.0];
+  // Precompute normalized color values for shader uniforms
+  const LIGHTEST_ORANGE = [
+    p.red(p.lightestOrange) / 255.0,
+    p.green(p.lightestOrange) / 255.0,
+    p.blue(p.lightestOrange) / 255.0,
+  ];
+  const DARKEST_ORANGE = [
+    p.red(p.darkestOrange) / 255.0,
+    p.green(p.darkestOrange) / 255.0,
+    p.blue(p.darkestOrange) / 255.0,
+  ];
 
   function preload() {
-    sandTexture = p.loadImage("/assets/sand.png");
-    sandBGTexture = p.loadImage("/assets/sand_bg.png");
+    sandTexture = p.loadImage("/assets/images/sand.png");
+    sandBGTexture = p.loadImage("/assets/images/sand_bg.png");
     gradientShader = p.loadShader(
       "/assets/shaders/pass.vert",
       "/assets/shaders/gradient.frag",
@@ -40,10 +50,32 @@ export default function createSandModule(p) {
         }
       }
 
-      //set shader uniforms (i
+      // Get moon angle from p5 global state (set by moon module)
+      const moonAngle = p.moonAngle || -3.0295637;
+      const minMoonAngle = p.minMoonAngle !== undefined ? p.minMoonAngle : 0;
+      const maxMoonAngle =
+        p.maxMoonAngle !== undefined ? p.maxMoonAngle : p.TWO_PI;
+
+      // Get track position values from audio manager (in seconds for p5.js)
+      const minTrackPos = audio ? audio.getMinTrackPosValue() : 0;
+      const maxTrackPos = audio ? audio.getMaxTrackPosValue() : 1;
+
+      //set shader uniforms
       gradientShader.setUniform("u_base", sandTexture);
-      // #TODO: make time scaled to position of moon
-      gradientShader.setUniform("u_time", p.millis() / 1000.0);
+      // Use moonAngle mapped to track position, divided by 500
+      // Note: track position is in seconds (p5.js) but Processing used milliseconds
+      // So we multiply by 1000 to convert seconds to milliseconds for the same scale
+      const u_time =
+        (p.map(
+          moonAngle,
+          minMoonAngle,
+          maxMoonAngle,
+          minTrackPos,
+          maxTrackPos,
+        ) *
+          1000.0) / // Convert seconds to milliseconds
+        500.0;
+      gradientShader.setUniform("u_time", u_time);
       gradientShader.setUniform("color_1", LIGHTEST_ORANGE);
       gradientShader.setUniform("color_2", DARKEST_ORANGE);
 

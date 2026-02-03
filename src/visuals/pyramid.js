@@ -1,4 +1,4 @@
-export default function createPyramidModule(p, colors) {
+export default function createPyramidModule(p) {
   let patternGraphics;
   let pyramidTexture;
   let innerPyramidScale = 0.65;
@@ -12,6 +12,13 @@ export default function createPyramidModule(p, colors) {
     [55, 319],
     [245, 155],
     [263, 160],
+  ];
+
+  let innerFrontCoords = [
+    [frontCoords[0][0] + 10, frontCoords[0][1] - 7],
+    [frontCoords[1][0] + 5, frontCoords[1][1] - 8],
+    frontCoords[2],
+    frontCoords[3],
   ];
 
   // right wall points
@@ -40,7 +47,7 @@ export default function createPyramidModule(p, colors) {
     // Clear and set up drawing styles
     pg.clear();
     pg.fill(0);
-    pg.stroke(colors.lightOrange);
+    pg.stroke(p.lightOrange);
     pg.strokeWeight(1);
 
     // Define cell dimensions
@@ -109,7 +116,7 @@ export default function createPyramidModule(p, colors) {
     p.translate(-p.width / 2, -p.height / 2);
 
     // Right wall (semi-transparent overlay)
-    p.stroke(colors.lightOrange);
+    p.stroke(p.lightOrange);
     p.strokeWeight(0.5);
     p.fill(0, 150);
     p.beginShape();
@@ -135,7 +142,7 @@ export default function createPyramidModule(p, colors) {
     p.endShape(p.CLOSE);
 
     // Tip highlight
-    p.fill(colors.lightestOrange);
+    p.fill(p.lightestOrange);
     p.noStroke();
     p.beginShape();
     for (let i = 0; i < 4; i++) {
@@ -158,8 +165,8 @@ export default function createPyramidModule(p, colors) {
     p.beginShape();
     // draw inner front wall
     for (let i = 0; i < 4; i++) {
-      let x = frontCoords[i][0];
-      let y = frontCoords[i][1];
+      let x = innerFrontCoords[i][0];
+      let y = innerFrontCoords[i][1];
       p.vertex(x, y);
     }
 
@@ -173,9 +180,9 @@ export default function createPyramidModule(p, colors) {
 
     // Inner tip highlight
     p.fill(
-      p.red(colors.lightestOrange),
-      p.green(colors.lightestOrange),
-      p.blue(colors.lightestOrange),
+      p.red(p.lightestOrange),
+      p.green(p.lightestOrange),
+      p.blue(p.lightestOrange),
       innerPyramidAlpha,
     );
     p.noStroke();
@@ -191,7 +198,7 @@ export default function createPyramidModule(p, colors) {
 
     //want to place a solid black shape over the inner pyramid right wall to create the illusion of depth
     p.fill(0, innerPyramidAlpha);
-    p.stroke(colors.lightOrange);
+    p.stroke(p.lightOrange);
     p.strokeWeight(0.25);
     //measurements derived from the scaled inner pyramid
     let innerPyramidRightBorder = [

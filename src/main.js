@@ -4,6 +4,12 @@ import createStarsModule from "./visuals/stars.js";
 import createPyramidModule from "./visuals/pyramid.js";
 import createMoonModule from "./visuals/moon.js";
 import createSandModule from "./visuals/sand.js";
+import createPulseModule from "./visuals/pulse.js";
+import createBeamModule from "./visuals/beam.js";
+import createBeamParticlesModule from "./visuals/beamParticles.js";
+import createTitleModule from "./visuals/title.js";
+import createBorderModule from "./visuals/border.js";
+import createMenuModule from "./visuals/menu.js";
 import createAudioManager from "./audio.js";
 
 const sketch = (p) => {
@@ -12,88 +18,99 @@ const sketch = (p) => {
   let pyramidModule;
   let moonModule;
   let sandModule;
-  const colors = {
-    // define colors to match the Processing sketch
-    lightestOrange: p.color(207, 134, 22), // #cf8616
-    lightOrange: p.color(214, 127, 29), // #d67f1d
-    orange: p.color(212, 106, 39), // #d46a27
-    darkestOrange: p.color(205, 79, 12), // #cd4f0c
-  };
+  let pulseModule;
+  let beamModule;
+  let beamParticlesModule;
+  let titleModule;
+  let borderModule;
+  let menuModule;
+
+  // define colors to match the Processing sketch
+  p.lightestOrange = p.color(207, 134, 22); // #cf8616
+  p.lightOrange = p.color(214, 127, 29); // #d67f1d
+  p.orange = p.color(212, 106, 39); // #d46a27
+  p.darkestOrange = p.color(205, 79, 12); // #cd4f0c
+
   // audio manager
-  // const audio = createAudioManager(p);
-  const audio = null;
+  p.audio = createAudioManager(p);
+  // p.audio = null;
 
   p.preload = () => {
     // audio should preload its sounds via p.loadSound
-    if (audio && audio.preload) audio.preload();
+    if (p.audio && p.audio.preload) p.audio.preload();
 
     starsModule = createStarsModule(p);
     if (starsModule.preload) starsModule.preload();
-
-    pyramidModule = createPyramidModule(p, colors);
-    if (pyramidModule.preload) pyramidModule.preload();
 
     moonModule = createMoonModule(p);
     if (moonModule.preload) moonModule.preload();
 
     sandModule = createSandModule(p);
     if (sandModule.preload) sandModule.preload();
+
+    beamParticlesModule = createBeamParticlesModule(p);
+    if (beamParticlesModule.preload) beamParticlesModule.preload();
+
+    pyramidModule = createPyramidModule(p);
+    if (pyramidModule.preload) pyramidModule.preload();
+
+    pulseModule = createPulseModule(p);
+    if (pulseModule.preload) pulseModule.preload();
+
+    beamModule = createBeamModule(p);
+    if (beamModule.preload) beamModule.preload();
+
+    titleModule = createTitleModule(p);
+    if (titleModule.preload) titleModule.preload();
+
+    borderModule = createBorderModule(p);
+    if (borderModule.preload) borderModule.preload();
+
+    menuModule = createMenuModule(p);
+    if (menuModule.preload) menuModule.preload();
   };
 
   p.setup = () => {
     p.createCanvas(512, 512, p.WEBGL);
     p.noSmooth();
 
-    // audio manager setup
-    if (audio && audio.setup) audio.setup();
+    if (p.audio && p.audio.setup) p.audio.setup();
 
     if (starsModule.setup) starsModule.setup();
-    // pass audio reference to the moon module (for later interaction)
-    if (moonModule.setup) moonModule.setup({ audio });
+    if (moonModule.setup) moonModule.setup();
     if (sandModule.setup) sandModule.setup();
+    if (beamParticlesModule.setup) beamParticlesModule.setup();
     if (pyramidModule.setup) pyramidModule.setup();
+    if (pulseModule.setup) pulseModule.setup();
+    if (beamModule.setup) beamModule.setup();
 
-    // Helper to map DOM event coords to canvas (internal) coords
-    const mapPointerEventToCanvas = (evt) => {
-      const canvasEl = p && p.canvas;
-      if (!canvasEl || !evt) return evt;
-      const rect = canvasEl.getBoundingClientRect();
-      const scaleX = canvasEl.width / rect.width; // internal pixels / css pixels
-      const scaleY = canvasEl.height / rect.height;
-      const x = (evt.clientX - rect.left) * scaleX;
-      const y = (evt.clientY - rect.top) * scaleY;
-      return Object.assign({}, evt, { scaledX: x, scaledY: y });
-    };
+    if (titleModule.setup) titleModule.setup();
+    if (borderModule.setup) borderModule.setup();
+    if (menuModule.setup) menuModule.setup();
 
-    // Forward Mouse Pressed (with scaled coords as scaledX/scaledY)
-    p.mousePressed = (evt) => {
-      const scaled = mapPointerEventToCanvas(evt);
-      if (moonModule.mousePressed) moonModule.mousePressed(scaled);
-    };
-
-    // Forward Mouse Dragged
-    p.mouseDragged = (evt) => {
-      const scaled = mapPointerEventToCanvas(evt);
-      if (moonModule.mouseDragged) moonModule.mouseDragged(scaled);
-    };
-
-    // Forward Mouse Released
-    p.mouseReleased = (evt) => {
-      const scaled = mapPointerEventToCanvas(evt);
-      if (moonModule.mouseReleased) moonModule.mouseReleased(scaled);
+    p.keyPressed = (evt) => {
+      if (p.audio && p.audio.keyPressed) p.audio.keyPressed(evt);
     };
 
     p.background(0);
   };
 
   p.draw = () => {
-    p.background(1);
+    p.background(0);
 
     // draw visuals in the same layering order as the Processing sketch
     if (starsModule.draw) starsModule.draw();
     if (moonModule.draw) moonModule.draw();
     if (sandModule.draw) sandModule.draw();
+    if (beamParticlesModule.draw) beamParticlesModule.draw();
+    if (beamModule.draw) beamModule.draw();
     if (pyramidModule.draw) pyramidModule.draw();
+    if (pulseModule.draw) pulseModule.draw();
+
+    // draw UI overlays on top
+    if (titleModule.draw) titleModule.draw();
+    if (borderModule.draw) borderModule.draw();
+    if (menuModule.draw) menuModule.draw();
   };
 };
 

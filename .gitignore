@@ -51,3 +51,5 @@ debug.log
 # (If you use a different lockfile or package manager, adjust accordingly)
 
 creative-coding-final/
+
+*.mp3

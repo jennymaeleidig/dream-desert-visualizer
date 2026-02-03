@@ -4,7 +4,7 @@ export default function createStarsModule(p) {
   let starsTextureConfigured = false;
 
   function preload() {
-    starsTexture = p.loadImage("/assets/stars.png");
+    starsTexture = p.loadImage("/assets/images/stars.png");
   }
 
   function setup() {
