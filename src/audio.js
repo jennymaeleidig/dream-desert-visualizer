@@ -4,72 +4,38 @@ export default function createAudioManager(p) {
   //OG Kanji Converted to half width kana so it works with the Japanese font
   //https://nihongodera.com/tools/convert
   //https://dencode.com/en/string/character-width
-  // const trackMetadata = [
-  //   {
-  //     url: "https://audio.jukehost.co.uk/vBwMG7PshIUrGKB6icEyhzjmvFU4moRC",
-  //     title: "ﾕﾋﾞ ｦ ﾅｶﾞﾚﾙ ｽﾅ",
-  //   },
-  //   {
-  //     url: "https://audio.jukehost.co.uk/xOhDG2N6LS3lv9DidOOTNe5QvwN1R6FI",
-  //     title: "ｻｷｭｳ",
-  //   },
-  //   {
-  //     url: "https://audio.jukehost.co.uk/ZKFjJ9jgIDMpYkwZv0RmOFUikTuvD0Nm",
-  //     title: "ｼﾞﾒﾝ ﾊ ｱﾂｲ",
-  //   },
-  //   {
-  //     url: "https://audio.jukehost.co.uk/ibyIu1IvFXu97DldyliZHEVbwUy0dDHy",
-  //     title: "ｽﾅ ﾉ ｸｯｼｮﾝ",
-  //   },
-  //   {
-  //     url: "https://audio.jukehost.co.uk/qbgwtJbo6tq2WKcpM1gKq1gBl181SqO8",
-  //     title: "ｲｷ",
-  //   },
-  //   {
-  //     url: "https://audio.jukehost.co.uk/iX2OshHcOd38hRMwAyPXeO66AM47Mp3o",
-  //     title: "ｻﾘｭｳ",
-  //   },
-  //   {
-  //     url: "https://audio.jukehost.co.uk/8gSqciA2zNTBwmL9kWKLDOsZyufoHuig",
-  //     title: "ｲｯｼｮｳ",
-  //   },
-  //   {
-  //     url: "https://audio.jukehost.co.uk/G1FotNyAPJyHooVr6x4IQyfjz2ZX7VjZ",
-  //     title: "ﾃﾝｺﾞｸ ﾉ ﾖｳﾅ ｶﾝｼﾞ",
-  //   },
-  // ];
 
   const trackMetadata = [
     {
-      url: "/assets/tracks/01.mp3",
+      url: import.meta.env.VITE_TRACK_01,
       title: "ﾕﾋﾞ ｦ ﾅｶﾞﾚﾙ ｽﾅ",
     },
     {
-      url: "/assets/tracks/02.mp3",
+      url: import.meta.env.VITE_TRACK_02,
       title: "ｻｷｭｳ",
     },
     {
-      url: "/assets/tracks/03.mp3",
+      url: import.meta.env.VITE_TRACK_03,
       title: "ｼﾞﾒﾝ ﾊ ｱﾂｲ",
     },
     {
-      url: "/assets/tracks/04.mp3",
+      url: import.meta.env.VITE_TRACK_04,
       title: "ｽﾅ ﾉ ｸｯｼｮﾝ",
     },
     {
-      url: "/assets/tracks/05.mp3",
+      url: import.meta.env.VITE_TRACK_05,
       title: "ｲｷ",
     },
     {
-      url: "/assets/tracks/06.mp3",
+      url: import.meta.env.VITE_TRACK_06,
       title: "ｻﾘｭｳ",
     },
     {
-      url: "/assets/tracks/07.mp3",
+      url: import.meta.env.VITE_TRACK_07,
       title: "ｲｯｼｮｳ",
     },
     {
-      url: "/assets/tracks/08.mp3",
+      url: import.meta.env.VITE_TRACK_08,
       title: "ﾃﾝｺﾞｸ ﾉ ﾖｳﾅ ｶﾝｼﾞ",
     },
   ];
