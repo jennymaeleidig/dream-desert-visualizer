@@ -13,15 +13,10 @@ export default function createMenuModule(p) {
     // Only draw menu when audio exists and is paused
     if (!audio || !audio.getCurrentTrack) return;
 
-    const currentTrack = audio.getCurrentTrack();
-    if (
-      !currentTrack ||
-      !currentTrack.sound ||
-      currentTrack.sound.isPlaying()
-    ) {
+    if (audio.isPlaying()) {
       return;
     }
-
+    const currentTrack = audio.getCurrentTrack();
     p.push();
     // Translate to top-left coordinate system (Processing compatible)
     p.translate(-p.width / 2, -p.height / 2);

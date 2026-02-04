@@ -1,4 +1,5 @@
-// Audio manager using p5 and p5.sound
+// Audio manager using Howler.js - Better mobile browser support
+import { Howl } from "howler";
 
 export default function createAudioManager(p) {
   //OG Kanji Converted to half width kana so it works with the Japanese font
@@ -40,47 +41,93 @@ export default function createAudioManager(p) {
     },
   ];
 
-  const tracks = []; // will hold { title, number, length, globalStartPos, globalEndPos, sound }
+  const tracks = []; // will hold { title, number, length, globalStartPos, globalEndPos, howl }
 
   let minTrackPos = 0;
   let maxTrackPos = 0;
   let globalVolume = 0.7;
   let currentTrackIndex = 0;
+  let isLoaded = false;
 
   function preload() {
-    p.soundFormats("mp3");
-    // Create audio elements and load metadata; durations will be set when metadata loads
+    // This function is intentionally left empty
+    // Audio loading happens asynchronously via loadAsync()
+  }
+
+  function loadAsync() {
+    // Create Howl instances for each track
+    // Howler.js handles mobile browsers better with:
+    // - HTML5 Audio fallback
+    // - Better buffering and streaming
+    // - Automatic iOS/Android audio unlock
     for (let i = 0; i < trackMetadata.length; i++) {
-      const soundObj = p.loadSound(trackMetadata[i].url);
+      const howl = new Howl({
+        src: [trackMetadata[i].url],
+        html5: true, // Enable streaming for better mobile performance
+        preload: true, // Load metadata
+        volume: globalVolume,
+        onload: function () {
+          // Update track metadata when loaded
+          const track = tracks[i];
+          track.length = howl.duration();
+          checkAllTracksLoaded();
+        },
+        onloaderror: function (id, error) {
+          console.error(`Failed to load track ${i + 1}:`, error);
+        },
+        onend: function () {
+          // Auto-advance to next track when current track ends
+          if (currentTrackIndex < tracks.length - 1) {
+            nextTrack();
+          }
+        },
+      });
+
       tracks.push({
         title: trackMetadata[i].title,
         number: i + 1,
         length: 0, // to be set on load
         globalStartPos: 0, // to be calculated on load
         globalEndPos: 0, // to be calculated on load
-        sound: soundObj,
+        howl: howl,
       });
     }
   }
 
-  function setup() {
+  function checkAllTracksLoaded() {
+    // Check if all tracks have loaded their durations
+    const allLoaded = tracks.every((track) => track.length > 0);
+    if (allLoaded && !isLoaded) {
+      isLoaded = true;
+      calculateGlobalPositions();
+    }
+  }
+
+  function calculateGlobalPositions() {
+    // Calculate global positions once all tracks are loaded
+    maxTrackPos = 0;
     for (const track of tracks) {
-      track.sound.setVolume(globalVolume);
-      track.length = track.sound.duration();
       track.globalStartPos = maxTrackPos;
       track.globalEndPos = maxTrackPos + track.length;
       maxTrackPos += track.length;
     }
   }
 
+  function setup() {
+    // Setup is handled asynchronously via loadAsync() and checkAllTracksLoaded()
+    // This function remains for compatibility with the existing API
+    loadAsync();
+  }
+
   function getCurrentGlobalPosition() {
-    return (
-      tracks[currentTrackIndex].globalStartPos +
-      tracks[currentTrackIndex].sound.currentTime()
-    );
+    if (tracks.length === 0 || !tracks[currentTrackIndex]) return 0;
+    const currentTrack = tracks[currentTrackIndex];
+    const currentTime = currentTrack.howl.seek() || 0;
+    return currentTrack.globalStartPos + currentTime;
   }
 
   function getCurrentTrack() {
+    if (tracks.length === 0 || !tracks[currentTrackIndex]) return null;
     return tracks[currentTrackIndex];
   }
 
@@ -92,54 +139,66 @@ export default function createAudioManager(p) {
     return maxTrackPos;
   }
 
+  function isPlaying() {
+    const current = getCurrentTrack();
+    if (!current) return false;
+    return current.howl.playing();
+  }
+
   function previousTrack() {
-    // jump to beginning of previous track
-    let wasPlaying = getCurrentTrack().sound.isPlaying();
-    if (currentTrackIndex > 0) {
-      let prevIndex = currentTrackIndex - 1;
-      getCurrentTrack().sound.stop();
-      currentTrackIndex = prevIndex;
+    const wasPlaying = isPlaying();
+
+    const current = getCurrentTrack();
+
+    if (current && currentTrackIndex > 0) {
+      current.howl.stop();
+      currentTrackIndex = currentTrackIndex - 1;
+
+      const newTrack = getCurrentTrack();
+      newTrack.howl.seek(0);
+
       if (wasPlaying) {
-        getCurrentTrack().sound.play(0, 1, globalVolume);
-      } else {
-        // Paused: play at volume 0, then pause to cue position
-        getCurrentTrack().sound.play(0, 1, 0);
-        getCurrentTrack().sound.stop();
-        getCurrentTrack().sound.setVolume(globalVolume);
+        newTrack.howl.play();
       }
+    } else {
+      // Already at first track, restart current track
+      current.howl.seek(0);
     }
   }
 
   function nextTrack() {
-    // jump to beginning of next track
-    let wasPlaying = getCurrentTrack().sound.isPlaying();
-    if (currentTrackIndex < tracks.length - 1) {
-      getCurrentTrack().sound.stop();
+    const wasPlaying = isPlaying();
+    const current = getCurrentTrack();
+    if (current && currentTrackIndex < tracks.length - 1) {
+      current.howl.stop();
       currentTrackIndex = currentTrackIndex + 1;
+
+      const newTrack = getCurrentTrack();
+      newTrack.howl.seek(0);
+
       if (wasPlaying) {
-        getCurrentTrack().sound.play(0, 1, globalVolume);
-      } else {
-        // Paused: play at volume 0, then pause to cue position
-        getCurrentTrack().sound.play(0, 1, 0);
-        getCurrentTrack().sound.stop();
-        getCurrentTrack().sound.setVolume(globalVolume);
+        newTrack.howl.play();
       }
     }
   }
 
   function keyPressed(evt) {
     // spacebar to play/pause
+    const current = getCurrentTrack();
+
+    if (!current) return;
+
     if (p.key === " ") {
-      if (getCurrentTrack().sound.isPlaying()) {
-        getCurrentTrack().sound.pause();
-      }
-      // if the player is at the end of the file, do nothing
-      else if (
-        getCurrentTrack().sound.currentTime() >= getCurrentTrack().length
-      ) {
-        return;
+      if (isPlaying()) {
+        current.howl.pause();
       } else {
-        getCurrentTrack().sound.play();
+        // Check if at the end of the track
+        const currentTime = current.howl.seek() || 0;
+        if (currentTime >= current.length - 0.1) {
+          // Restart from beginning if at the end
+          current.howl.seek(0);
+        }
+        current.howl.play();
       }
     }
 
@@ -154,23 +213,27 @@ export default function createAudioManager(p) {
     if (p.keyCode === p.UP_ARROW) {
       // increase volume
       globalVolume = Math.min(1.0, globalVolume + 0.1);
-      getCurrentTrack().sound.setVolume(globalVolume);
+      current.howl.volume(globalVolume);
     }
 
     if (p.keyCode === p.DOWN_ARROW) {
       // decrease volume
       globalVolume = Math.max(0.0, globalVolume - 0.1);
-      getCurrentTrack().sound.setVolume(globalVolume);
+      current.howl.volume(globalVolume);
     }
   }
 
   return {
     preload,
+    loadAsync,
     setup,
     getCurrentGlobalPosition,
     getCurrentTrack,
     getMinTrackPosValue,
     getMaxTrackPosValue,
     keyPressed,
+    isPlaying,
+    previousTrack,
+    nextTrack,
   };
 }

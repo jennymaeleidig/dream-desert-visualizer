@@ -1,5 +1,4 @@
 import "./p5-setup.js"; // This MUST be the first import
-import "p5/lib/addons/p5.sound.js";
 import createStarsModule from "./visuals/stars.js";
 import createPyramidModule from "./visuals/pyramid.js";
 import createMoonModule from "./visuals/moon.js";
@@ -11,6 +10,20 @@ import createTitleModule from "./visuals/title.js";
 import createBorderModule from "./visuals/border.js";
 import createMenuModule from "./visuals/menu.js";
 import createAudioManager from "./audio.js";
+
+// Function to hide loading overlay (defined before sketch)
+const hideLoadingOverlay = () => {
+  const loadingOverlay = document.getElementById("loading-overlay");
+  if (loadingOverlay && !loadingOverlay.classList.contains("hidden")) {
+    loadingOverlay.classList.add("hidden");
+    // Remove from DOM after transition completes
+    setTimeout(() => {
+      if (loadingOverlay.parentNode) {
+        loadingOverlay.remove();
+      }
+    }, 300);
+  }
+};
 
 const sketch = (p) => {
   // visual modules
@@ -33,7 +46,6 @@ const sketch = (p) => {
 
   // audio manager
   p.audio = createAudioManager(p);
-  // p.audio = null;
 
   p.preload = () => {
     // audio should preload its sounds via p.loadSound
@@ -75,14 +87,7 @@ const sketch = (p) => {
     p.noSmooth();
 
     // Hide the loading overlay once p5.js is ready
-    const loadingOverlay = document.getElementById("loading-overlay");
-    if (loadingOverlay) {
-      loadingOverlay.classList.add("hidden");
-      // Remove from DOM after transition completes
-      setTimeout(() => {
-        loadingOverlay.remove();
-      }, 300);
-    }
+    hideLoadingOverlay();
 
     if (p.audio && p.audio.setup) p.audio.setup();
 
