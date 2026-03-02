@@ -38,6 +38,11 @@ const sketch = (p) => {
   let borderModule;
   let menuModule;
 
+  // mobile controls
+  let btnPrevEl;
+  let btnPlayEl;
+  let btnNextEl;
+
   // define colors to match the Processing sketch
   p.lightestOrange = p.color(207, 134, 22); // #cf8616
   p.lightOrange = p.color(214, 127, 29); // #d67f1d
@@ -89,6 +94,10 @@ const sketch = (p) => {
     // Hide the loading overlay once p5.js is ready
     hideLoadingOverlay();
 
+    // Show the playback controls
+    const controls = document.getElementById('mobile-controls');
+    if (controls) controls.classList.add('visible');
+
     if (p.audio && p.audio.setup) p.audio.setup();
 
     if (starsModule.setup) starsModule.setup();
@@ -103,15 +112,56 @@ const sketch = (p) => {
     if (borderModule.setup) borderModule.setup();
     if (menuModule.setup) menuModule.setup();
 
+    // Brief visual flash on a button to mirror keyboard input
+    const flashButton = (el) => {
+      if (!el) return;
+      el.classList.add('pressed');
+      setTimeout(() => el.classList.remove('pressed'), 120);
+    };
+
     p.keyPressed = (evt) => {
       if (p.audio && p.audio.keyPressed) p.audio.keyPressed(evt);
+
+      // Flash the matching control button for keyboard shortcuts
+      if (p.key === ' ') flashButton(btnPlayEl);
+      if (p.keyCode === p.LEFT_ARROW) flashButton(btnPrevEl);
+      if (p.keyCode === p.RIGHT_ARROW) flashButton(btnNextEl);
     };
+
+    // Wire up mobile controls
+    btnPrevEl = document.getElementById('btn-prev');
+    btnPlayEl = document.getElementById('btn-play');
+    btnNextEl = document.getElementById('btn-next');
+
+    if (btnPrevEl) {
+      btnPrevEl.addEventListener('click', () => {
+        if (p.audio) p.audio.previousTrack();
+        btnPrevEl.blur();
+      });
+    }
+    if (btnPlayEl) {
+      btnPlayEl.addEventListener('click', () => {
+        if (p.audio) p.audio.togglePlayPause();
+        btnPlayEl.blur();
+      });
+    }
+    if (btnNextEl) {
+      btnNextEl.addEventListener('click', () => {
+        if (p.audio) p.audio.nextTrack();
+        btnNextEl.blur();
+      });
+    }
 
     p.background(0);
   };
 
   p.draw = () => {
     p.background(0);
+
+    // Update play/pause button icon
+    if (btnPlayEl && p.audio) {
+      btnPlayEl.textContent = p.audio.isPlaying() ? '||' : '>';
+    }
 
     // draw visuals in the same layering order as the Processing sketch
     if (starsModule.draw) starsModule.draw();

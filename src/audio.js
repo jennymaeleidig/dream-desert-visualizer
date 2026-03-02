@@ -182,24 +182,30 @@ export default function createAudioManager(p) {
     }
   }
 
+  function togglePlayPause() {
+    const current = getCurrentTrack();
+    if (!current) return;
+
+    if (isPlaying()) {
+      current.howl.pause();
+    } else {
+      // Check if at the end of the track
+      const currentTime = current.howl.seek() || 0;
+      if (currentTime >= current.length - 0.1) {
+        // Restart from beginning if at the end
+        current.howl.seek(0);
+      }
+      current.howl.play();
+    }
+  }
+
   function keyPressed(evt) {
-    // spacebar to play/pause
     const current = getCurrentTrack();
 
     if (!current) return;
 
     if (p.key === " ") {
-      if (isPlaying()) {
-        current.howl.pause();
-      } else {
-        // Check if at the end of the track
-        const currentTime = current.howl.seek() || 0;
-        if (currentTime >= current.length - 0.1) {
-          // Restart from beginning if at the end
-          current.howl.seek(0);
-        }
-        current.howl.play();
-      }
+      togglePlayPause();
     }
 
     if (p.keyCode === p.RIGHT_ARROW) {
@@ -233,6 +239,7 @@ export default function createAudioManager(p) {
     getMaxTrackPosValue,
     keyPressed,
     isPlaying,
+    togglePlayPause,
     previousTrack,
     nextTrack,
   };
