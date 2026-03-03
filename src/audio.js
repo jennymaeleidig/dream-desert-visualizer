@@ -63,6 +63,7 @@ export default function createAudioManager(p) {
     for (let i = 0; i < trackMetadata.length; i++) {
       const howl = new Howl({
         src: [trackMetadata[i].url],
+        format: ['mp3'], // Explicit format since JukeHost URLs lack file extensions
         html5: true, // Enable streaming for better mobile performance
         preload: true, // Load metadata
         volume: globalVolume,
